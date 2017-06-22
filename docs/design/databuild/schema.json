@@ -1,0 +1,50 @@
+{
+  "MOs": [
+    {
+      "MO-name": "site creation",
+      "attributes": [
+        {
+          "attribute-name": "name1",
+          "default-value": 0,
+          "range": "0-9",
+          "data-type":"integer"
+        },
+        {
+          "attribute-name": "name2",
+          "default-value": "default",
+          "range": "",
+          "data-type":"string"
+        },
+        {
+          "attribute-name": "name3",
+          "default-value": true,
+          "range": "",
+          "data-type":"bool"
+        }
+      ]
+    },
+    {
+      "MO-name": "MO2",
+      "attributes": [
+        {
+          "attribute-name": "name1",
+          "default-value": 0,
+          "range": "0-9",
+          "data-type":"integer"
+        },
+        {
+          "attribute-name": "name2",
+          "default-value": 0,
+          "range": "0-9",
+          "data-type":"integer"
+        },
+        {
+          "attribute-name": "name3",
+          "default-value": 0,
+          "range": "",
+          "data-type":"string"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "MOs": [
+    {
+      "MO-name": "MO3",
+      "attributes": [
+        {
+          "attribute-name": "name1",
+          "value": 23
+        },
+        {
+          "attribute-name": "name2",
+          "value": 34.56
+        },
+        {
+          "attribute-name": "name3",
+          "value": "string value"
+        }
+      ]
+    },
+    {
+      "MO-name": "Some other MO",
+      "attributes": [
+        {
+          "attribute-name": "some other attribute name1",
+          "value": 23
+        },
+        {
+          "attribute-name": "some other attribute name2",
+          "value": 34.56
+        },
+        {
+          "attribute-name": "some other attribute name3",
+          "value": "string value"
+        }
+      ]
+    }
+  ]
+}
