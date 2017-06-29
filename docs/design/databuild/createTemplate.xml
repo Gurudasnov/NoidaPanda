@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<createTemplate name="new output" creationDate="2017-06-09 10:31:01.499 +0530" originator="" description="">
+<MO1 id="0" method="create">
+<attributes>
+<attribute1>10</attribute1>
+<attribute2>90.0</attribute2>
+<attribute3>this is a mandatory attribute. use the default value</attribute2>
+<userSpecificInfo></userSpecificInfo></attributes></MO1>
+</createTemplate>

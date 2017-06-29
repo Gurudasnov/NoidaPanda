@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<updateTemplate name="new output" creationDate="2017-06-09 10:31:01.499 +0530" originator="" description="">
+<MO1 id="0" method="update">
+<attributes>
+<attribute1>10</attribute1>
+<attribute2>90.0</attribute2>
+<attribute3>this is a mandatory attribute. use the default value</attribute2>
+<type>this is optional no default value for this. leave it as is</type>
+<userSpecificInfo></userSpecificInfo></attributes></MO1>
+<MO3 id="0" method="update"> <!-- this is a MO that is not included in the data given with json. Need to read the data from snapshot-->
+<attributes>
+<attribute1>10</attribute1>
+<attribute2>90.0</attribute2>
+</attributes></MO3>
+</updateTemplate>
