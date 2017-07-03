@@ -17,7 +17,7 @@ import org.apache.spark.sql.Dataset;
 	        Dataset<Row> df = sql.read()
 	        		             .format("com.databricks.spark.xml")
 	        		             .option("rowTag", "managedObject")
-	        		             .load("C:\\CM.xml");
+	        		             .load("C:\\CMdir1\\CM.xml");
 	        System.out.println("Table with managed objects");
 			df.show(25,false);
 			
@@ -29,15 +29,25 @@ import org.apache.spark.sql.Dataset;
 			System.out.println("Displays all p name and values for all managed objects");
 		    df.show(10, false);
 		
-			//To read all 'p' for a managed object with id=1209282
-			Dataset<Row> df1 = sql.read().format("com.databricks.spark.xml").option("rowTag", "managedObject").load("C:\\CM.xml");
+			
+			Dataset<Row> df1 = sql.read().format("com.databricks.spark.xml").option("rowTag", "managedObject").load("C:\\{CMdir1\\*.xml,CMdir2\\*.xml}");
 			df1.createOrReplaceTempView("test");
+			
+					
+			//To read all 'p' for a managed object with id=1209282
 			Dataset<Row> results = sql.sql("select p from test where _id=1209282");
 			results.show();
 			
 			System.out.println("Displays all names and values for p for managed objects with id=1209282");
+			
 			results.selectExpr("explode(p) as e").select("e.*").show(100, false);
 			results.selectExpr("explode(p) as e").select("e.*").createOrReplaceTempView("test1");
+			
+			
+			System.out.println("Displays p with name=name"); 
+			Dataset<Row> results_name = sql.sql("select _value from test1 where _name LIKE '%name%'");
+			results_name.show();
+			
 			
 			Dataset<Row> p_result = sql.sql("select _value from test1");
 			p_result.show();
