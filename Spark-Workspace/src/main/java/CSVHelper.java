@@ -19,7 +19,6 @@ import org.apache.spark.sql.types.StructType;
 
 public class CSVHelper
 {
-//	private static String firstLine = null;
 	private static SparkConf spConfig = null;
 	private static SparkSession spSession = null;
 	private static SparkContext spContext = null;
@@ -209,6 +208,12 @@ public class CSVHelper
 		Dataset<Row> df3 = spSession.sql("select * from csvFile1 FULL JOIN csvFile2 on csvFile1.EMPID = csvFile2.EMPID");
 		df3.show();
 	}
+	public static void parseCSVUsingDatabricks(String csvFile1)
+	{
+        Dataset<Row> df = spSession.read().format("com.databricks.spark.csv").option("inferSchema", "true").option("header", "true").load(csvFile1);
+        df.show();
+        df.printSchema();
+	}
 	public static void main(String[] args) throws Exception
 	{
 		Properties config = new Properties();
@@ -218,59 +223,61 @@ public class CSVHelper
 		String hadoopHomeDir = config.getProperty("hadoop.home.dir");
 		System.setProperty("hadoop.home.dir", hadoopHomeDir);
 		fieldsMap = new HashMap<String, String>();
-		int i = 1;
-		boolean isException = false;
-		while(true)
-		{
-			String fieldMapping = config.getProperty("FieldMapping" + i);
-			if(fieldMapping == null)
-				break;
-			if(fieldMapping.isEmpty())
-			{
-				isException = true;
-				StringBuffer strEx = new StringBuffer("\nSyntax for FieldMapping is:");
-				strEx.append("\nFieldMappingN=FieldName:FieldType");
-				strEx.append("\nwhere N is greater than 1");
-				throw new Exception(strEx.toString());
-			}
-			String[] fields = fieldMapping.split(":");
-			if(fields.length != 2)
-			{
-				isException = true;
-				StringBuffer strEx = new StringBuffer("\nSyntax for FieldMapping is:");
-				strEx.append("\nFieldMappingN=FieldName:FieldType");
-				strEx.append("\nwhere N is greater than 1");
-				throw new Exception(strEx.toString());
-			}
-			if(fields[0] == null || fields[0].isEmpty())
-			{
-				isException = true;
-				throw new Exception("FieldName Cannot Be Null");
-			}
-			if(fields[1] == null || fields[1].isEmpty())
-			{
-				isException = true;
-				throw new Exception("FieldType Cannot Be Null");
-			}
-			if(fieldsMap.get(fields[0]) != null)
-			{
-				isException = true;
-				throw new Exception("Duplicate fieldMapping for " + fields[0]);
-			}
-			if(isException)
-				break;
-			fieldsMap.put(fields[0], fields[1]);
-			i = i + 1;
-		}
+//		int i = 1;
+//		boolean isException = false;
+//		while(true)
+//		{
+//			String fieldMapping = config.getProperty("FieldMapping" + i);
+//			if(fieldMapping == null)
+//				break;
+//			if(fieldMapping.isEmpty())
+//			{
+//				isException = true;
+//				StringBuffer strEx = new StringBuffer("\nSyntax for FieldMapping is:");
+//				strEx.append("\nFieldMappingN=FieldName:FieldType");
+//				strEx.append("\nwhere N is greater than 1");
+//				throw new Exception(strEx.toString());
+//			}
+//			String[] fields = fieldMapping.split(":");
+//			if(fields.length != 2)
+//			{
+//				isException = true;
+//				StringBuffer strEx = new StringBuffer("\nSyntax for FieldMapping is:");
+//				strEx.append("\nFieldMappingN=FieldName:FieldType");
+//				strEx.append("\nwhere N is greater than 1");
+//				throw new Exception(strEx.toString());
+//			}
+//			if(fields[0] == null || fields[0].isEmpty())
+//			{
+//				isException = true;
+//				throw new Exception("FieldName Cannot Be Null");
+//			}
+//			if(fields[1] == null || fields[1].isEmpty())
+//			{
+//				isException = true;
+//				throw new Exception("FieldType Cannot Be Null");
+//			}
+//			if(fieldsMap.get(fields[0]) != null)
+//			{
+//				isException = true;
+//				throw new Exception("Duplicate fieldMapping for " + fields[0]);
+//			}
+//			if(isException)
+//				break;
+//			fieldsMap.put(fields[0], fields[1]);
+//			i = i + 1;
+//		}
 		spConfig = new SparkConf().setMaster("local[*]");
 		spSession = SparkSession.builder().config(spConfig).getOrCreate();
 		spContext = spSession.sparkContext();
 //		String csvFile = config.getProperty("csvFile");
 //		CSVHelper.parseCSVUsingRDD(csvFile);
 //		CSVHelper.parseCSVUsingDataFrame(csvFile);
-		String csvFile1 = config.getProperty("csvFile1");
-		String csvFile2 = config.getProperty("csvFile2");
-		CSVHelper.parseMultipleCSVUsingRDD(csvFile1, csvFile2);
+//		String csvFile1 = config.getProperty("csvFile1");
+//		String csvFile2 = config.getProperty("csvFile2");
+//		CSVHelper.parseMultipleCSVUsingRDD(csvFile1, csvFile2);
+		String csvFile = config.getProperty("csvFile");
+		CSVHelper.parseCSVUsingDatabricks(csvFile);
 		spSession.stop();
 	}
 }
