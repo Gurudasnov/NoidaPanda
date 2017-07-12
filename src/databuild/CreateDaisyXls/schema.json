@@ -1,0 +1,50 @@
+{
+  "MOs": [
+    {
+      "MO_name": "RMOD",
+      "attributes": [
+        {
+          "attribute_name": "rmodID",
+          "default_value": 77,
+          "range": "0_9",
+          "data_type":"integer"
+        },
+        {
+          "attribute_name": "lnBtsId",
+          "default_value": "33",
+          "range": "",
+          "data_type":"string"
+        },
+        {
+          "attribute_name": "prodCode",
+          "default_value": true,
+          "range": "",
+          "data_type":"bool"
+        }
+      ]
+    },
+    {
+      "MO_name": "SMOD",
+      "attributes": [
+        {
+          "attribute_name": "smodID",
+          "default_value": 0,
+          "range": "0-9",
+          "data_type":"integer"
+        },
+        {
+          "attribute_name": "lnBtsId",
+          "default_value": 1,
+          "range": "0-9",
+          "data_type":"integer"
+        },
+        {
+          "attribute_name": "prodCode",
+          "default_value": 0,
+          "range": "",
+          "data_type":"string"
+        }
+      ]
+    }
+  ]
+}

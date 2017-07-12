@@ -1,0 +1,38 @@
+{											
+  "MOs": [									
+    {										
+      "MO_name": "RMOD",//MO name to be repeated
+      "attributes": [
+        {
+          "attribute_name": "rmodId",
+          "value": 12
+        },
+        {
+          "attribute_name": "lnBtsId",
+          "value": "string value"
+        },
+        {
+          "attribute_name": "prodCode",
+          "value": true
+        }
+      ]
+    },
+    {
+      "MO-name": "RMOD",
+      "attributes": [
+        {
+          "attribute_name": "rmodId",
+          "value": 23
+        },
+        {
+          "attribute_name": "lnBtsId",
+          "value": 34.56
+        },
+        {
+          "attribute_name": "prodCode",
+          "value": "string value"
+        }
+      ]
+    }
+  ]
+}
