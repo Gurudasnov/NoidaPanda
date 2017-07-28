@@ -1,0 +1,25 @@
+{
+  "name": "reactapp",
+  "version": "1.0.0",
+  "description": "vijay test",
+  "main": "ok",
+  "scripts": {
+    "start": "webpack-dev-server --hot",
+    "bundle": "build-bundle ./ -o dist -v 1.0.0",
+    "bundle-watch": "build-bundle ./ -o dist -v 1.0.0 -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "yes"
+  },
+  "keywords": [
+    "vijay"
+  ],
+  "author": "vijay",
+  "license": "ISC",
+  "dependencies": {
+    "build-bundle": "^2.0.8",
+    "prop-types": "^15.5.10"
+  },
+  "devDependencies": {}
+}
