@@ -1,0 +1,25 @@
+{
+  "name": "helloreact",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server --hot",
+    "bundle": "build-bundle ./ -o dist -v 1.0.0",
+    "bundle-watch": "build-bundle ./ -o dist -v 1.0.0 -w"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "babel": "^6.23.0",
+    "build-bundle": "^2.0.8",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-router-dom": "^4.1.2",
+    "webpack": "^3.1.0",
+    "webpack-dev-server": "^2.5.1"
+  },
+  "devDependencies": {
+    "babel-preset-react": "^6.24.1"
+  }
+}
