@@ -199,7 +199,7 @@ public class TransformPM {
        
        ReadCSVAndStoreInCassandra(builder1, writer1, FILENAME2, CASSANDRA_PATH2);
       
-       
+       /*
        //Setup spark session
        SparkSession sql = SparkSession.builder().appName("PM data")
 				                                  // .config("spark.sql.warehouse.dir", "file:/C:/Users/admin/workspace/Spark_transformationsActions_PM/spark-warehouse/")
@@ -218,8 +218,10 @@ public class TransformPM {
         sql.conf().set("spark.local.ip", "192.168.104.63");
         
        	connector = CassandraConnector.apply(sql.sparkContext().conf());
+       	
 		session = connector.openSession();
  		session.execute("USE customer1");
+ 		*/
 	    //System.setProperty("hadoop.home.dir", "C:\\spark-2.1.1-bin-hadoop2.7\\");
 	    System.setProperty("hadoop.home.dir", "/opt/spark-2.2.0-bin-hadoop2.7");
 	    
