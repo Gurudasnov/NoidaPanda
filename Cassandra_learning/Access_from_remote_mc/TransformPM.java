@@ -55,40 +55,74 @@ public class TransformPM {
 	private static final String CASSANDRA_PATH1 = "/opt/apache-cassandra-3.11.0/data/data/customer1/pm";
 	
 	//private static final String CASSANDRA_PATH2 = "C:\\apache-cassandra-3.11.0\\data\\customer1\\pm1";
-	private static final String CASSANDRA_PATH2 = "/opt/apache-cassandra-3.11.0/data/customer1/pm1";
+	private static final String CASSANDRA_PATH2 = "/opt/apache-cassandra-3.11.0/data/data/customer1/pm1";
 	
 	private static JMXConnector jmxconnector;
     private static StorageServiceMBean storageBean;
     private static Session session;
     private static CassandraConnector connector;
+    
     private static void connect(String host, int port) throws IOException, MalformedObjectNameException
     {
-    	System.setProperty("java.rmi.server.hostname",java.net.InetAddress.getLocalHost().getHostName());
+    	//System.setProperty("java.rmi.server.hostname",java.net.InetAddress.getLocalHost().getHostName());
     	
-    	System.out.println("java.rmi.server.hostname: " + System.getProperty("java.rmi.server.hostname"));
-    	System.out.println(java.net.InetAddress.getLocalHost().getHostName());
+    	//System.out.println(java.net.InetAddress.getLocalHost().getHostName());
     	
+        System.setProperty("java.rmi.server.hostname", host);
+    	
+    	System.out.println("java.rmi.server.hostname: " + System.getProperty("java.rmi.server.hostname"));  
         JMXServiceURL jmxUrl = new JMXServiceURL(String.format("service:jmx:rmi:///jndi/rmi://%s:%d/jmxrmi", host, port));
-    	//JMXServiceURL jmxUrl = new JMXServiceURL(String.format("service:jmx:rmi://%s:%d/jndi/rmi://%s:%d/jmxrmi", host, port, host,port));
-        //LocateRegistry.createRegistry(port);
-        Map<String, Object> env = new HashMap<String, Object>();
+    	Map<String, Object> env = new HashMap<String, Object>();
         env.put(JMXConnector.CREDENTIALS,new String[]{"cassandra","cassandra"});
         jmxconnector = JMXConnectorFactory.connect(jmxUrl, env);
        
 
         MBeanServerConnection mbeanServerConn = jmxconnector.getMBeanServerConnection();
+        if(mbeanServerConn == null)
+        	System.out.println("mbeanServerConn is null");
+        
         ObjectName name = new ObjectName("org.apache.cassandra.db:type=StorageService");
         storageBean = JMX.newMBeanProxy(mbeanServerConn, name, StorageServiceMBean.class);
+        System.out.println("JMX connection completed ");
     }
 
-	public static void main(String[] args) throws IOException, MalformedObjectNameException, InvalidRequestException, ParseException {
-	   	  
+	public static void main(String[] args) throws IOException, MalformedObjectNameException, InvalidRequestException, ParseException 
+	{
+	   	 
+	/*	
 	   //Building a cluster
-       Cluster cluster = Cluster.builder().addContactPoint("192.168.104.63").withCredentials("cassandra", "cassandra").build();
+        Cluster cluster = Cluster.builder().addContactPoint("192.168.104.63").withCredentials("cassandra", "cassandra").build();
        session = cluster.connect();
-       
-       
-       
+      */
+		
+	 //Setup spark session
+    
+	 SparkSession sql = SparkSession.builder().appName("PM data")
+			                                  // .config("spark.sql.warehouse.dir", "file:/C:/Users/admin/workspace/Spark_transformationsActions_PM/spark-warehouse/")
+	     	                                   .config("spark.sql.warehouse.dir", "file:/opt/resources/spark-warehouse/")
+			                                   .config("spark.cassandra.connection.host","192.168.104.63")
+			                                   .config("spark.cassandra.connection.port", "9042")
+			                                   .config("spark.cassandra.auth.username", "cassandra")
+	                                           .config("spark.cassandra.auth.password", "cassandra")
+	                                           .config("spark.cassandra.output.batch.grouping.key", "none")
+	                                           .config("spark.cassandra.output.batch.size.bytes", "2048")
+	                                         //  .config("spark.blockManager.port", "38020")
+	                                         //  .config("spark.broadcast.port", "38021")
+	                                         //  .config("spark.driver.port", "38022")
+	                                         //  .config("spark.executor.port", "38023")
+	                                         //  .config("spark.fileserver.port", "38024")
+	                                         //  .config("spark.replClassServer.port", "38025")
+		                                       //.master("local[*]") 
+			                                   .getOrCreate();
+			
+	        sql.conf().set("spark.sql.crossJoin.enabled", "true");
+	        sql.conf().set("spark.cassandra.output.consistency.level", "ANY");
+	        	              
+	       	connector = CassandraConnector.apply(sql.sparkContext().conf());
+	      
+			session = connector.openSession();
+            Cluster cluster = session.getCluster();
+            
       /* 
        String query = "CREATE KEYSPACE IF NOT EXISTS customer1 WITH replication "
     		   + "= {'class':'SimpleStrategy', 'replication_factor':3}; ";
@@ -105,19 +139,22 @@ public class TransformPM {
        
            
        final String SCHEMA = "CREATE TABLE IF NOT EXISTS customer1.pm (" + 
-    		   "Period_start_time timestamp, " + 
-    		   //"Period_start_time text, " + 
-               "PLMN_name text, " + 
-               "RNC_name text, " +
-               "WCEL_name text, " +
-               "TT_UMTS_CS_NQI decimal, " +
-               "TT_UMTS_PS_NQI_V1 decimal, " +
-               "TT_UMTS_CS_ACCESSIBILITY decimal, " +
-               "TT_UMTS_CS_RETAINABILITY decimal, " +
-               "TT_UMTS_PS_ACCESSIBILITY decimal, " +
-               "TT_UMTS_PS_RETAINABILITY decimal, " +
-               "PRIMARY KEY (WCEL_name, Period_start_time))" ; 
-       
+            		   "Period_start_time timestamp, " + 
+            		   //"Period_start_time text, " + 
+                       "PLMN_name text, " + 
+                       "RNC_name text, " +
+                       "WCEL_name text, " +
+                       "TT_UMTS_CS_NQI decimal, " +
+                       "TT_UMTS_PS_NQI_V1 decimal, " +
+                       "TT_UMTS_CS_ACCESSIBILITY decimal, " +
+                       "TT_UMTS_CS_RETAINABILITY decimal, " +
+                       "TT_UMTS_PS_ACCESSIBILITY decimal, " +
+                       "TT_UMTS_PS_RETAINABILITY decimal, " +
+                       "PRIMARY KEY (WCEL_name, Period_start_time))" +
+                       "WITH default_time_to_live = 300 " +
+                       "AND GC_GRACE_SECONDS = 60 " + 
+                       "AND compaction = {'class' : 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'enabled' : 'true', 'tombstone_compaction_interval': '600', 'compaction_window_size': '2', 'compaction_window_unit': 'MINUTES', 'min_threshold': '2'}"; 
+             /*        
        final String SCHEMA1 = "CREATE TABLE IF NOT EXISTS customer1.pm1 (" + 
     		   "Period_start_time timestamp, " + 
     		   //"Period_start_time text, " + 
@@ -130,14 +167,24 @@ public class TransformPM {
                "TT_UMTS_CS_RETAINABILITY decimal, " +
                "TT_UMTS_PS_ACCESSIBILITY decimal, " +
                "TT_UMTS_PS_RETAINABILITY decimal, " +
-               "PRIMARY KEY (WCEL_name, Period_start_time))" ; 
+               "PRIMARY KEY (WCEL_name, Period_start_time))" ; /*+
+               "WITH default_time_to_live = 300 " +
+               "AND GC_GRACE_SECONDS = 60 " + 
+               "AND compaction = {'class' : 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'enabled' : 'true', 'tombstone_compaction_interval': '600', 'compaction_window_size': '2', 'compaction_window_unit': 'MINUTES', 'min_threshold': '2'}"; */ 
+       /*+
+               "WITH default_time_to_live = 600 " +
+               "AND GC_GRACE_SECONDS = 60 " + 
+               "AND compaction = {'class' : 'org.apache.cassandra.db.compaction.TimeWindowCompactionStrategy', 'compaction_window_size': '1', 'compaction_window_unit': 'MINUTES', 'min_threshold': '2'}"; */  
+       
        
        final String INSERT_STMT = "INSERT INTO customer1.pm (Period_start_time, PLMN_name, RNC_name, WCEL_name, TT_UMTS_CS_NQI, TT_UMTS_PS_NQI_V1, TT_UMTS_CS_ACCESSIBILITY, TT_UMTS_CS_RETAINABILITY, TT_UMTS_PS_ACCESSIBILITY, TT_UMTS_PS_RETAINABILITY ) VALUES (?,?,?,?,?,?,?,?,?,?)";	   
        final String INSERT_STMT1 = "INSERT INTO customer1.pm1 (Period_start_time, PLMN_name, RNC_name, WCEL_name, TT_UMTS_CS_NQI, TT_UMTS_PS_NQI_V1, TT_UMTS_CS_ACCESSIBILITY, TT_UMTS_CS_RETAINABILITY, TT_UMTS_PS_ACCESSIBILITY, TT_UMTS_PS_RETAINABILITY) VALUES (?,?,?,?,?,?,?,?,?,?)";
        
              
        session.execute(SCHEMA);
-       session.execute(SCHEMA1);
+                   
+            
+       //session.execute(SCHEMA1);
        
             
        // Prepare SSTable writer 
@@ -152,7 +199,7 @@ public class TransformPM {
              .using(INSERT_STMT) ;
             
        CQLSSTableWriter writer = builder.build(); 
-       
+       /*
        CQLSSTableWriter.Builder builder1 = CQLSSTableWriter.builder(); 
        
        builder1.inDirectory(CASSANDRA_PATH2) 
@@ -162,9 +209,10 @@ public class TransformPM {
        .using(INSERT_STMT1) ;
        
        CQLSSTableWriter writer1 = builder1.build(); 
-      
+      */
        ReadCSVFromHDFSAndStoreInCassandra(builder, writer, FILENAMEHDFS, CASSANDRA_PATH1);
        //ReadCSVAndStoreInCassandra(builder, writer, FILENAME1, CASSANDRA_PATH1);
+       /*
        ReadCSVAndStoreInCassandra(builder1, writer1, FILENAME2, CASSANDRA_PATH2);
       
        
@@ -176,6 +224,8 @@ public class TransformPM {
 				                                   .config("spark.cassandra.connection.port", "9042")
 				                                   .config("spark.cassandra.auth.username", "cassandra")
                                                    .config("spark.cassandra.auth.password", "cassandra")
+                                                   .config("spark.cassandra.output.batch.grouping.key", "none")
+                                                   .config("spark.cassandra.output.batch.size.bytes", "2048")
 				                                   //.master("local[*]")
 				                                   .getOrCreate();
 		
@@ -192,6 +242,7 @@ public class TransformPM {
 	    Transformations1(sql);
 	    Transformations2(sql);
 	    
+	    
 	    Dataset<Row> df_mid = Transformations3(sql);
 	    	    
 	    
@@ -205,7 +256,7 @@ public class TransformPM {
           }).mode(SaveMode.Append).save();
 		
 		session.execute("ALTER TABLE customer1.pm DROP result_mid");
-		
+		*/
 	    jmxconnector.close();
 	    session.close();
 	    
@@ -213,10 +264,12 @@ public class TransformPM {
 	    	System.out.println("Session is closed");
 	    else
 	    	System.out.println("Session is open");
-	    sql.close();
-	    cluster.close();
+	    //sql.close();
+	    
+	    //cluster.close();
 	    
 	}
+	
 	public static void ReadCSVAndStoreInCassandra(CQLSSTableWriter.Builder builder, CQLSSTableWriter writer, final String FILENAME, final String CASSANDRA_PATH) throws IOException, MalformedObjectNameException, InvalidRequestException, ParseException
 	{
 		System.out.println("Reading CSV file: " + FILENAME);
@@ -269,7 +322,11 @@ public class TransformPM {
 
 				}
 			  }
+		   
+		     
 		    //Jmxloader to load the SSTable to Cassandra
+		     
+		    	     
 		     //connect("localhost", 7199);
 		     connect("192.168.104.63", 7199);
 		     storageBean.bulkLoad(CASSANDRA_PATH);
@@ -301,7 +358,6 @@ public class TransformPM {
 	       System.out.println("fs.default.name : - " + config.get("fs.default.name"));
 	       
 	       //Get the filesystem - HDFS
-	       //FileSystem fs = FileSystem.get(URI.create("http://192.168.104.62:50075/webhdfs/v1/PMFiles/" + FILENAME), config);
 	       FileSystem fs = FileSystem.get(URI.create(hdfsuri + FILENAME), config);
 	       FSDataInputStream in = null;
 
@@ -352,7 +408,43 @@ public class TransformPM {
 
 				}
 			  }
-		    //Jmxloader to load the SSTable to Cassandra
+		   
+		      System.out.println("Hostname: " + java.net.InetAddress.getLocalHost().getHostName());
+		      if(java.net.InetAddress.getLocalHost().getHostName().equalsIgnoreCase("spark-hdfs"))
+		      {
+		    	 System.out.println("SCP initiated from remote node");  
+		    	 
+		    	 File folder = new File("/opt/apache-cassandra-3.11.0/data/data/customer1/pm");
+		    	 File[] listOfFiles = folder.listFiles();
+		    	 for (int i = 0; i < listOfFiles.length; i++)
+		    	 {
+  		    	   String command = "/usr/bin/scp /opt/apache-cassandra-3.11.0/data/data/customer1/pm/" + listOfFiles[i].getName() + " root@192.168.104.63:/opt/apache-cassandra-3.11.0/data/data/customer1/pm";
+		    	   try
+		    	   {
+		    	     Process process = Runtime.getRuntime().exec(command);
+		    	   /*
+		    	     InputStream stderr = process.getErrorStream();
+		             InputStreamReader isr = new InputStreamReader(stderr);
+		             BufferedReader bfr = new BufferedReader(isr);
+		             String lines = null;
+		             System.out.println("<ERROR>");
+		             while ( (lines = bfr.readLine()) != null)
+		                System.out.println(lines);
+		             System.out.println("</ERROR>");
+		    	 */
+		           
+				     int exitVal = process.waitFor();
+				     System.out.println("Scp exit val:" + exitVal);
+		    	    
+			      } catch (Throwable t){
+				  // TODO Auto-generated catch block
+				  t.printStackTrace();
+				  }
+		    	 }
+			  }
+		     
+			     
+		     //Jmxloader to load the SSTable to Cassandra
 		     //connect("localhost", 7199);
 		     connect("192.168.104.63", 7199);
 		     storageBean.bulkLoad(CASSANDRA_PATH);
