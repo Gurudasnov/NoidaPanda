@@ -1,0 +1,22 @@
+{
+  "name": "npo_ui",
+  "version": "1.0.0",
+  "description": "npo react js",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server --hot"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "babel": "^6.23.0",
+    "build-bundle": "^2.0.8",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "webpack": "^3.3.0",
+    "webpack-dev-server": "^2.6.1"
+  },
+  "devDependencies": {
+    "babel-preset-react": "^6.24.1"
+  }
+}
